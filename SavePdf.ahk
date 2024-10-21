@@ -9,6 +9,30 @@ if !config.Has("windowTitle") {
     ExitApp
 }
 
+NavigateToPatient(app) {
+    app.FindElement({Type:"MenuItem", Name:"Afspraken"}).Click()
+    app.WaitElement({Name:"Overzicht OK andere dag", mm:2}).Click()
+
+    ; To-do: Select Date
+
+    app.FindElement({Type:"Button", Name:"Selecteer"}).Click()
+
+    ; To-do: Select which operation
+
+    app.WaitElement({Name:"Selecteer patiënt", mm:2}).Click()
+    app.FindElement({Type:"MenuItem", Name:"Dossier"}).Click()
+    app.WaitElement({Name:"Volledig dossier", mm:2}).Click()
+
+    interventions := app.WaitElement({Name:"Ingrepen", mm:2})
+    interventions.Click()
+    ; dd/mm/yyyy Orthopedie
+    orthopedics := interventions.FindElement({Type:"TreeItem", Name:"Orthopedie"})
+    orthopedics.Click()
+
+    ; dd/mm/yyyy <description>
+    orthopedics.WaitElement({Type:"TreeItem", Name:"dd/mm/yyyy", mm:2}).Click()
+}
+
 Main() {
     app := GetWindow(config["windowTitle"])
     if !app {
