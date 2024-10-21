@@ -1,5 +1,7 @@
 # Save PDF
-This project automatically creates a PDF from the configured window
+This project automatically creates a PDF from the configured window.
+
+**Disclaimer:** This script is made custom for an undisclosed application. It will not work for most applications.
 
 ## Requirements
 - [AutoHotKey v2](https://www.autohotkey.com/download/)
