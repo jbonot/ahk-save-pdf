@@ -42,14 +42,41 @@ TestGetPatientData() {
     for index, entry in cases {
         data := GetPatientData(entry[1])
         if (data) {
-            Assert(data.age == entry[2].age &&
+            Assert(
+                data.age == entry[2].age &&
                 data.dob == entry[2].dob &&
                 data.name == entry[2].name &&
                 data.country == entry[2].country
-                , index, "TestGetPatientData")
+                , index, "TestGetPatientData"
+            )
         } else {
             Assert(data == entry[2], index, "TestGetPatientData")
         }
+    }
+}
+
+TestLoadDates() {
+    entries := LoadDates('dates.example.txt')
+    expected := [{
+        day: "03",
+        month: "05",
+        year: "2024",
+        name: "Skywalker"
+    }, {
+        day: "04",
+        month: "05",
+        year: "2024",
+        name: "Solo"
+    }]
+
+    for index, entry in entries {
+        Assert(
+            entry.day == expected[index].day &&
+            entry.month == expected[index].month &&
+            entry.year == expected[index].year &&
+            entry.name == expected[index].name
+            , index, "TestGetPatientData"
+        )
     }
 }
 
@@ -57,6 +84,7 @@ Main() {
     TestCapitalizeName()
     TestLoadConfig()
     TestGetPatientData()
+    TestLoadDates()
 }
 
 Main()
