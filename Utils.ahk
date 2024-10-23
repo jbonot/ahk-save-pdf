@@ -3,16 +3,16 @@
 
 GetWindow(searchHandleSubstring) {
     windowList := WinGetList()
-    
+
     foundHandle := 0
     for hwnd in windowList {
-        windowTitle := WinGetTitle(hwnd)    
+        windowTitle := WinGetTitle(hwnd)
         if InStr(windowTitle, searchHandleSubstring) {
             foundHandle := hwnd
             break
         }
     }
-    
+
     return foundHandle ? UIA.ElementFromHandle(foundHandle) : 0
 }
 
@@ -39,11 +39,11 @@ LoadConfig(filename) {
     config := Map()
     for line in StrSplit(configContent, "`r`n") {
         line := Trim(line)
-        
+
         if line = "" || SubStr(line, 1, 1) = ";" {
-            continue 
+            continue
         }
-        
+
         ; Expected format: <key>=<value>
         parts := StrSplit(line, "=")
         if parts.Length = 2 {
@@ -54,4 +54,27 @@ LoadConfig(filename) {
     }
 
     return config
+}
+
+LoadDates(filename) {
+    filePath := A_ScriptDir . "\" . filename
+    if !FileExist(filePath) {
+        MsgBox "Dates not found!".filePath
+        ExitApp
+    }
+
+    content := FileRead(filePath)
+    lines := StrSplit(content, "`r`n")
+    dates := []
+
+    for index, line in lines
+    {
+        fields := StrSplit(line, "`t")
+        dates.Push({
+            date: fields[1],
+            name: fields[2]
+        })
+    }
+
+    return dates
 }
