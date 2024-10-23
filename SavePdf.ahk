@@ -10,36 +10,46 @@ if !config.Has("windowTitle") {
     ExitApp
 }
 
-
 DownloadAllEntries(app) {
+    processed := []
     for entry in dates {
-        app.FindElement({ Type: "MenuItem", Name: "Afspraken" }).Click()
-        app.WaitElement({ Name: "Overzicht OK andere dag", mm: 2 }).Click()
+        GoToCalendarView(app, entry)
 
-        ; Select Date
-        dateSelect := GetWindow("Selecteer een datum")
-        dateSelect.FindElement({ Type: "Spinner", Name: "day" }).Value := entry.day
-        dateSelect.FindElement({ Type: "Spinner", Name: "month" }).Value := entry.month
-        dateSelect.FindElement({ Type: "Spinner", Name: "year" }).Value := entry.year
-        dateSelect.FindElement({ Type: "Button", Name: "Selecteer" }).Click()
+        ; To-do: Narrow scope to calendar instead of app
+        calendar := app
+        for timeslot in calendar.FindAll({ Name: StrUpper(entry.name), mm: 2 }) {
+            if timeslot.Name in processed {
+                continue
+            }
 
-        ; To-do: Select timetable element instead of app
-        timeslots := app.FindAll({ Name: StrUpper(entry.name), mm: 2 })
-        for timeslot in timeslots {
             timeslot.Click()
             app.WaitElement({ Name: "Selecteer patiënt", mm: 2 }).Click()
             app.FindElement({ Type: "MenuItem", Name: "Dossier" }).Click()
             app.WaitElement({ Name: "Volledig dossier", mm: 2 }).Click()
 
-            NavigateToPatient(app, entry.fullDate)
+            GoToReport(app, entry.fullDate)
             DownloadFile(app)
+            processed.Push(timeslot.Name)
 
-            ; To-do: Go back to calendar view???
+            ; To-do: Go back to calendar view
+            GoToCalendarView(app, entry)
         }
     }
 }
 
-NavigateToPatient(app, date) {
+GoToCalendarView(app, entry) {
+    app.FindElement({ Type: "MenuItem", Name: "Afspraken" }).Click()
+    app.WaitElement({ Name: "Overzicht OK andere dag", mm: 2 }).Click()
+
+    ; Select Date
+    dateSelect := GetWindow("Selecteer een datum")
+    dateSelect.FindElement({ Type: "Spinner", Name: "day" }).Value := entry.day
+    dateSelect.FindElement({ Type: "Spinner", Name: "month" }).Value := entry.month
+    dateSelect.FindElement({ Type: "Spinner", Name: "year" }).Value := entry.year
+    dateSelect.FindElement({ Type: "Button", Name: "Selecteer" }).Click()
+}
+
+GoToReport(app, date) {
     interventions := app.WaitElement({ Name: "Ingrepen", mm: 2 })
     interventions.Click()
 
@@ -87,7 +97,9 @@ Main() {
         ExitApp
     }
 
-    ; DownloadAllEntries
+    ; DownloadAllEntries(app) ; Uncomment when the bottom two work
+
+    ; GoToReport(app, "01/01/2024") ; From the patient page
     DownloadFile(app)
 }
 
