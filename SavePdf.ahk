@@ -23,13 +23,19 @@ DownloadAllEntries(app) {
         dateSelect.FindElement({ Type: "Spinner", Name: "year" }).Value := entry.year
         dateSelect.FindElement({ Type: "Button", Name: "Selecteer" }).Click()
 
-        ; To-do: Select which operation
+        ; To-do: Select timetable element instead of app
+        timeslots := app.FindAll({ Name: StrUpper(entry.name), mm: 2 })
+        for timeslot in timeslots {
+            timeslot.Click()
+            app.WaitElement({ Name: "Selecteer patiënt", mm: 2 }).Click()
+            app.FindElement({ Type: "MenuItem", Name: "Dossier" }).Click()
+            app.WaitElement({ Name: "Volledig dossier", mm: 2 }).Click()
 
-        app.WaitElement({ Name: "Selecteer patiënt", mm: 2 }).Click()
-        app.FindElement({ Type: "MenuItem", Name: "Dossier" }).Click()
-        app.WaitElement({ Name: "Volledig dossier", mm: 2 }).Click()
+            NavigateToPatient(app, entry.fullDate)
+            DownloadFile(app)
 
-        NavigateToPatient(app, entry.fullDate)
+            ; To-do: Go back to calendar view???
+        }
     }
 }
 
@@ -81,6 +87,7 @@ Main() {
         ExitApp
     }
 
+    ; DownloadAllEntries
     DownloadFile(app)
 }
 
