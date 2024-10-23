@@ -1,6 +1,5 @@
 #Requires AutoHotkey v2
-#include Utils.ahk
-#include ..\UIA-v2-main\Lib\UIA.ahk
+#include ..\Utils.ahk
 
 Assert(result, key, test) {
     if (result) {
@@ -22,7 +21,7 @@ TestCapitalizeName() {
 }
 
 TestLoadConfig() {
-    config := LoadConfig('config.example.ini')
+    config := LoadConfig('..\config.example.ini')
     Assert(config.Has("windowTitle"), "key", "TestLoadConfig")
     Assert(config["windowTitle"] == "Editor", "value", "TestLoadConfig")
 }
@@ -56,7 +55,7 @@ TestGetPatientData() {
 }
 
 TestLoadDates() {
-    entries := LoadDates('dates.example.txt')
+    entries := LoadDates('..\dates.example.txt')
     expected := [{
         fullDate: "03/05/2024",
         day: "03",
