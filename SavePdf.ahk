@@ -3,6 +3,7 @@
 #include ..\UIA-v2-main\Lib\UIA.ahk
 
 config := LoadConfig('config.ini')
+entries := LoadDates('dates.txt')
 
 if !config.Has("windowTitle") {
     MsgBox "Missing config: windowTitle"
@@ -10,27 +11,27 @@ if !config.Has("windowTitle") {
 }
 
 NavigateToPatient(app) {
-    app.FindElement({Type:"MenuItem", Name:"Afspraken"}).Click()
-    app.WaitElement({Name:"Overzicht OK andere dag", mm:2}).Click()
+    app.FindElement({ Type: "MenuItem", Name: "Afspraken" }).Click()
+    app.WaitElement({ Name: "Overzicht OK andere dag", mm: 2 }).Click()
 
     ; To-do: Select Date
 
-    app.FindElement({Type:"Button", Name:"Selecteer"}).Click()
+    app.FindElement({ Type: "Button", Name: "Selecteer" }).Click()
 
     ; To-do: Select which operation
 
-    app.WaitElement({Name:"Selecteer patiënt", mm:2}).Click()
-    app.FindElement({Type:"MenuItem", Name:"Dossier"}).Click()
-    app.WaitElement({Name:"Volledig dossier", mm:2}).Click()
+    app.WaitElement({ Name: "Selecteer patiënt", mm: 2 }).Click()
+    app.FindElement({ Type: "MenuItem", Name: "Dossier" }).Click()
+    app.WaitElement({ Name: "Volledig dossier", mm: 2 }).Click()
 
-    interventions := app.WaitElement({Name:"Ingrepen", mm:2})
+    interventions := app.WaitElement({ Name: "Ingrepen", mm: 2 })
     interventions.Click()
     ; dd/mm/yyyy Orthopedie
-    orthopedics := interventions.FindElement({Type:"TreeItem", Name:"Orthopedie"})
+    orthopedics := interventions.FindElement({ Type: "TreeItem", Name: "Orthopedie" })
     orthopedics.Click()
 
     ; dd/mm/yyyy <description>
-    orthopedics.WaitElement({Type:"TreeItem", Name:"dd/mm/yyyy", mm:2}).Click()
+    orthopedics.WaitElement({ Type: "TreeItem", Name: "dd/mm/yyyy", mm: 2 }).Click()
 }
 
 Main() {
@@ -40,35 +41,29 @@ Main() {
         ExitApp
     }
 
-    ; Fetch patient info
-    patient := Map()
     fileName := 0
     toolbar := app.FindFirst("ControlType", "ToolBar")
     staticTextItems := toolbar.FindAll("ControlType", "Text")
     for item in staticTextItems {
-        ; Format: (<age>) (DD/MM/YYY) Last Name, First Name (<country>)
-        if (RegExMatch(item.Current.Name, "(\d{1,2}j) \((\d{1,2})/(\d{1,2})/(\d{4})\) ([\w\s,]+) \((\w+)\)", &match)) {
-            patient["age"] := match[1]
-            patient["dob"] := match[2] . "." . match[3] . "." . match[4]
-            patient["name"] := CapitalizeName(Trim(match[5]))
-            patient["country"] := match[6]
-            fileName := patient["name"] . " " . patient["dob"]
+        patient := GetPatientData(item.Current.Name)
+        if (patient) {
+            fileName := patient.name . " " . patient.dob
             break
         }
     }
-    
-    app.FindElement({Type:"MenuItem", Name:"Afdrukken"}).Click()
-    app.WaitElement({Name:"Nota view", mm:2}).Click()
+
+    app.FindElement({ Type: "MenuItem", Name: "Afdrukken" }).Click()
+    app.WaitElement({ Name: "Nota view", mm: 2 }).Click()
 
     WinWait("Print")
     printEl := GetWindow("Print")
-    printEl.FindElement({Type:"Button", Name:"Print"}).Click()
-    
+    printEl.FindElement({ Type: "Button", Name: "Print" }).Click()
+
     WinWait("Printeruitvoer opslaan als")
     printEl := GetWindow("Printeruitvoer opslaan als")
     if fileName {
-        printEl.FindElement({Type:"Edit", Name:"Bestandsnaam"}).Valuee := fileName
-        printEl.FindElement({Type:"Button", Name:"Opslaan"}).Click()
+        printEl.FindElement({ Type: "Edit", Name: "Bestandsnaam" }).Valuee := fileName
+        printEl.FindElement({ Type: "Button", Name: "Opslaan" }).Click()
     } else {
         MsgBox "Patient info not found"
     }
