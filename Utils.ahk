@@ -69,6 +69,10 @@ LoadDates(filename) {
 
     for index, line in lines
     {
+        if not line {
+            continue
+        }
+
         fields := StrSplit(line, "`t")
         date := StrSplit(fields[1], ".")
         dates.Push({
