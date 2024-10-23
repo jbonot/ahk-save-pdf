@@ -58,11 +58,13 @@ TestGetPatientData() {
 TestLoadDates() {
     entries := LoadDates('dates.example.txt')
     expected := [{
+        fullDate: "03/05/2024",
         day: "03",
         month: "05",
         year: "2024",
         name: "Skywalker"
     }, {
+        fullDate: "04/05/2024",
         day: "04",
         month: "05",
         year: "2024",
@@ -71,6 +73,7 @@ TestLoadDates() {
 
     for index, entry in entries {
         Assert(
+            entry.day == expected[index].day &&
             entry.day == expected[index].day &&
             entry.month == expected[index].month &&
             entry.year == expected[index].year &&

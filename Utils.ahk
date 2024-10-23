@@ -74,8 +74,9 @@ LoadDates(filename) {
         }
 
         fields := StrSplit(line, "`t")
-        date := StrSplit(fields[1], ".")
+        date := StrSplit(fields[1], "/")
         dates.Push({
+            fullDate: fields[1],
             day: date[1],
             month: date[2],
             year: date[3],

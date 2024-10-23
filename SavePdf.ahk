@@ -3,44 +3,49 @@
 #include ..\UIA-v2-main\Lib\UIA.ahk
 
 config := LoadConfig('config.ini')
-entries := LoadDates('dates.txt')
+dates := LoadDates('dates.txt')
 
 if !config.Has("windowTitle") {
     MsgBox "Missing config: windowTitle"
     ExitApp
 }
 
-NavigateToPatient(app) {
-    app.FindElement({ Type: "MenuItem", Name: "Afspraken" }).Click()
-    app.WaitElement({ Name: "Overzicht OK andere dag", mm: 2 }).Click()
 
-    ; To-do: Select Date
+DownloadAllEntries(app) {
+    for entry in dates {
+        app.FindElement({ Type: "MenuItem", Name: "Afspraken" }).Click()
+        app.WaitElement({ Name: "Overzicht OK andere dag", mm: 2 }).Click()
 
-    app.FindElement({ Type: "Button", Name: "Selecteer" }).Click()
+        ; Select Date
+        dateSelect := GetWindow("Selecteer een datum")
+        dateSelect.FindElement({ Type: "Spinner", Name: "day" }).Value := entry.day
+        dateSelect.FindElement({ Type: "Spinner", Name: "month" }).Value := entry.month
+        dateSelect.FindElement({ Type: "Spinner", Name: "year" }).Value := entry.year
+        dateSelect.FindElement({ Type: "Button", Name: "Selecteer" }).Click()
 
-    ; To-do: Select which operation
+        ; To-do: Select which operation
 
-    app.WaitElement({ Name: "Selecteer patiënt", mm: 2 }).Click()
-    app.FindElement({ Type: "MenuItem", Name: "Dossier" }).Click()
-    app.WaitElement({ Name: "Volledig dossier", mm: 2 }).Click()
+        app.WaitElement({ Name: "Selecteer patiënt", mm: 2 }).Click()
+        app.FindElement({ Type: "MenuItem", Name: "Dossier" }).Click()
+        app.WaitElement({ Name: "Volledig dossier", mm: 2 }).Click()
 
+        NavigateToPatient(app, entry.fullDate)
+    }
+}
+
+NavigateToPatient(app, date) {
     interventions := app.WaitElement({ Name: "Ingrepen", mm: 2 })
     interventions.Click()
+
     ; dd/mm/yyyy Orthopedie
-    orthopedics := interventions.FindElement({ Type: "TreeItem", Name: "Orthopedie" })
+    orthopedics := interventions.FindElement({ Type: "TreeItem", Name: date . " Orthopedie" })
     orthopedics.Click()
 
     ; dd/mm/yyyy <description>
-    orthopedics.WaitElement({ Type: "TreeItem", Name: "dd/mm/yyyy", mm: 2 }).Click()
+    orthopedics.WaitElement({ Type: "TreeItem", Name: date, mm: 2 }).Click()
 }
 
-Main() {
-    app := GetWindow(config["windowTitle"])
-    if !app {
-        MsgBox "Window not found: " . config['windowTitle']
-        ExitApp
-    }
-
+DownloadFile(app) {
     fileName := 0
     toolbar := app.FindFirst("ControlType", "ToolBar")
     staticTextItems := toolbar.FindAll("ControlType", "Text")
@@ -67,6 +72,16 @@ Main() {
     } else {
         MsgBox "Patient info not found"
     }
+}
+
+Main() {
+    app := GetWindow(config["windowTitle"])
+    if !app {
+        MsgBox "Window not found: " . config['windowTitle']
+        ExitApp
+    }
+
+    DownloadFile(app)
 }
 
 Main()
