@@ -16,14 +16,14 @@ TestCapitalizeName() {
     ]
 
     for index, entry in cases {
-        Assert(CapitalizeName(entry[1]) == entry[2], index, "TestCapitalizeName")
+        Assert(CapitalizeName(entry[1]) == entry[2], index, A_ThisFunc)
     }
 }
 
 TestLoadConfig() {
     config := LoadConfig('..\config.example.ini')
-    Assert(config.Has("windowTitle"), "key", "TestLoadConfig")
-    Assert(config["windowTitle"] == "Editor", "value", "TestLoadConfig")
+    Assert(config.Has("windowTitle"), "key", A_ThisFunc)
+    Assert(config["windowTitle"] == "Editor", "value", A_ThisFunc)
 }
 
 TestGetPatientData() {
@@ -46,10 +46,10 @@ TestGetPatientData() {
                 data.dob == entry[2].dob &&
                 data.name == entry[2].name &&
                 data.country == entry[2].country
-                , index, "TestGetPatientData"
+                , index, A_ThisFunc
             )
         } else {
-            Assert(data == entry[2], index, "TestGetPatientData")
+            Assert(data == entry[2], index, A_ThisFunc)
         }
     }
 }
@@ -77,16 +77,16 @@ TestLoadDates() {
             entry.month == expected[index].month &&
             entry.year == expected[index].year &&
             entry.name == expected[index].name
-            , index, "TestGetPatientData"
+            , index, A_ThisFunc
         )
     }
 }
 
-Main() {
+Test() {
     TestCapitalizeName()
     TestLoadConfig()
     TestGetPatientData()
     TestLoadDates()
 }
 
-Main()
+Test()

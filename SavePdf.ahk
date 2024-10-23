@@ -2,18 +2,12 @@
 #include Utils.ahk
 #include ..\UIA-v2-main\Lib\UIA.ahk
 
-config := LoadConfig('config.ini')
 dates := LoadDates('dates.txt')
 
-if !config.Has("windowTitle") {
-    MsgBox "Missing config: windowTitle"
-    ExitApp
-}
-
-DownloadAllEntries(app) {
+DownloadAllEntries(app, isTest := 0) {
     processed := []
     for entry in dates {
-        GoToCalendarView(app, entry)
+        GoToCalendar(app, entry)
 
         ; To-do: Narrow scope to calendar instead of app
         calendar := app
@@ -23,30 +17,34 @@ DownloadAllEntries(app) {
             }
 
             timeslot.Click()
-            app.WaitElement({ Name: "Selecteer patiënt", mm: 2 }).Click()
-            app.FindElement({ Type: "MenuItem", Name: "Dossier" }).Click()
-            app.WaitElement({ Name: "Volledig dossier", mm: 2 }).Click()
-
+            GoToPatient(app)
             GoToReport(app, entry.fullDate)
-            DownloadFile(app)
+            DownloadFile(app, isTest)
             processed.Push(timeslot.Name)
 
             ; To-do: Go back to calendar view
-            GoToCalendarView(app, entry)
+            GoToCalendar(app, entry)
         }
     }
 }
 
-GoToCalendarView(app, entry) {
+GoToPatient(app) {
+    app.WaitElement({ Name: "Selecteer patiënt", mm: 2 }).Click()
+    app.FindElement({ Type: "MenuItem", Name: "Dossier" }).Click()
+    app.WaitElement({ Name: "Volledig dossier", mm: 2 }).Click()
+}
+
+GoToCalendar(app, entry) {
     app.FindElement({ Type: "MenuItem", Name: "Afspraken" }).Click()
     app.WaitElement({ Name: "Overzicht OK andere dag", mm: 2 }).Click()
 
     ; Select Date
-    dateSelect := GetWindow("Selecteer een datum")
+    dateSelect := WinWait("Selecteer een datum")
     dateSelect.FindElement({ Type: "Spinner", Name: "day" }).Value := entry.day
     dateSelect.FindElement({ Type: "Spinner", Name: "month" }).Value := entry.month
     dateSelect.FindElement({ Type: "Spinner", Name: "year" }).Value := entry.year
     dateSelect.FindElement({ Type: "Button", Name: "Selecteer" }).Click()
+    return 1
 }
 
 GoToReport(app, date) {
@@ -59,9 +57,10 @@ GoToReport(app, date) {
 
     ; dd/mm/yyyy <description>
     orthopedics.WaitElement({ Type: "TreeItem", Name: date, mm: 2 }).Click()
+    return 1
 }
 
-DownloadFile(app) {
+DownloadFile(app, isTest := 0) {
     fileName := 0
     toolbar := app.FindFirst("ControlType", "ToolBar")
     staticTextItems := toolbar.FindAll("ControlType", "Text")
@@ -84,18 +83,39 @@ DownloadFile(app) {
     printEl := GetWindow("Printeruitvoer opslaan als")
     if fileName {
         printEl.FindElement({ Type: "Edit", Name: "Bestandsnaam" }).Valuee := fileName
-        printEl.FindElement({ Type: "Button", Name: "Opslaan" }).Click()
+        saveBtn := printEl.FindElement({ Type: "Button", Name: "Opslaan" })
+        if (isTest) {
+            saveBtn.Highlight()
+            printEl.FindElement({ Type: "Button", Name: "Close" }).Click()
+        } else {
+            saveBtn.Click()
+        }
     } else {
         MsgBox "Patient info not found"
+        return 0
     }
+
+    return 1
 }
 
-Main() {
+GetApplication(filename) {
+    config := LoadConfig(filename)
+    if !config.Has("windowTitle") {
+        MsgBox "Missing config: windowTitle"
+        ExitApp
+    }
+
     app := GetWindow(config["windowTitle"])
     if !app {
         MsgBox "Window not found: " . config['windowTitle']
         ExitApp
     }
+
+    return app
+}
+
+Main() {
+    app := GetApplication('config.ini')
 
     ; DownloadAllEntries(app) ; Uncomment when the bottom two work
 
