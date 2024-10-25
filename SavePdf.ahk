@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2
 #include Utils.ahk
-#include ..\UIA-v2-main\Lib\UIA.ahk
+#include libs\UIA.ahk
 
 dates := LoadDates('dates.txt')
 

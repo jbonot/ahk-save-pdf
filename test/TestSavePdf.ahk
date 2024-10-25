@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2
 #include ..\SavePdf.ahk
-#include ..\..\UIA-v2-main\Lib\UIA.ahk
+#include ..\libs\UIA.ahk
 
 entries := LoadDates('..\dates.txt')
 

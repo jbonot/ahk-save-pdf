@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2
-#include ..\UIA-v2-main\Lib\UIA.ahk
+#include libs\UIA.ahk
 
 GetWindow(searchHandleSubstring) {
     windowList := WinGetList()
