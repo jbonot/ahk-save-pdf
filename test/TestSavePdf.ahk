@@ -51,5 +51,4 @@ class TestSavePdf {
     
 }
 
-test := TestSavePdf()
-test.Test()
+TestSavePdf().Test()
