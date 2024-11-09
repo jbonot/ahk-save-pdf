@@ -37,7 +37,7 @@ GoToPatient(app) {
 GoToCalendar(entry) {
     Click(283, 33) ; "Afspraken"
     Sleep(500)
-    Click(360, 140) ; "Overzich OK andere dag"
+    Click(360, 140) ; "Overzicht OK andere dag"
     Sleep(500)
 
     if WinExist("Selecteer een datum") {
