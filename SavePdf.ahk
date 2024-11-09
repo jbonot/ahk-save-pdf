@@ -98,18 +98,18 @@ DownloadFile(app, isTest := 0) {
     return 1
 }
 
-GetApplication(filename) {
+ActivateApp(filename) {
     config := LoadConfig(filename)
     if !config.Has("windowTitle") {
         MsgBox "Missing config: windowTitle"
         ExitApp
     }
 
-    app := GetWindow(config["windowTitle"])
-    if !app {
+    if WinExist(config["windowTitle"]) {
+        WinActivate
+        return 1
+    } else {
         MsgBox "Window not found: " . config['windowTitle']
         ExitApp
     }
-
-    return app
 }

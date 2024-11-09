@@ -2,7 +2,7 @@
 #include .\SavePdf.ahk
 
 Main() {
-    app := GetApplication('config.ini')
+    ActivateApp('config.ini')
 
     ; DownloadAllEntries(app) ; Uncomment when the bottom two work
 

@@ -2,7 +2,7 @@
 #include ..\SavePdf.ahk
 #include ..\libs\UIA.ahk
 
-entries := LoadDates('..\dates.txt')
+entries := LoadDates('TestSavePdf.dates.txt')
 
 class TestSavePdf {
 
@@ -14,10 +14,8 @@ class TestSavePdf {
         }
     }
     
-    TestGetApplication() {
-        app := GetApplication('..\config.ini')
-        this.Assert(app, A_ThisFunc)
-        return app
+    TestActivateApp() {
+        this.Assert(ActivateApp('..\config.ini'), A_ThisFunc)
     }
     
     TestDownloadFile(app) {
@@ -37,7 +35,7 @@ class TestSavePdf {
     }
     
     Test() {
-        app := this.TestGetApplication()
+        this.TestActivateApp()
     
         ; if (app) {
         ;     TestGoToCalendar(app)
