@@ -12,7 +12,7 @@ DownloadAllEntries(app, isTest := 0) {
         ; To-do: Narrow scope to calendar instead of app
         calendar := app
         for timeslot in calendar.FindAll({ Name: StrUpper(entry.name), mm: 2 }) {
-            if timeslot.Name in processed {
+            if processed.Has(timeslot.Name) {
                 continue
             }
 
@@ -120,7 +120,7 @@ Main() {
     ; DownloadAllEntries(app) ; Uncomment when the bottom two work
 
     ; GoToReport(app, "01/01/2024") ; From the patient page
-    DownloadFile(app)
+    ; DownloadFile(app)
 }
 
 Main()

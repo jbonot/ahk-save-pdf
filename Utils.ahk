@@ -59,7 +59,7 @@ LoadConfig(filename) {
 LoadDates(filename) {
     filePath := A_ScriptDir . "\" . filename
     if !FileExist(filePath) {
-        MsgBox "Dates not found!".filePath
+        MsgBox "Dates not found!" . filePath
         ExitApp
     }
 
