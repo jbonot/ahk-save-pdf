@@ -1,5 +1,6 @@
 #Requires AutoHotkey v2
 #include libs\UIA.ahk
+#include libs\Gdip.ahk
 
 GetWindow(searchHandleSubstring) {
     windowList := WinGetList()
@@ -54,6 +55,34 @@ LoadConfig(filename) {
     }
 
     return config
+}
+
+MakeScreenshot(directory) {
+    ;Screen:	x: 0	y: 74	w: 2560	h: 1326
+    filePath := "C:\path\to\screenshot.png"
+    pBitmap := Gdip_BitmapFromScreen(x "|" y "|" width "|" height)
+    Gdip_SaveBitmapToFile(pBitmap, filePath)
+    Gdip_DisposeImage(pBitmap)
+    tesseractPath := "C:\Program Files\Tesseract-OCR\tesseract.exe"
+    outputPath := "C:\path\to\output"
+    RunWait, %tesseractPath% "%filePath%" "%outputPath%" -c tessedit_create_hocr=1 --oem 3 -l eng
+    FileRead, hocrContent, %outputPath%.hocr
+
+    ; Extract coordinates (simple example, customize as needed)
+    targetText := "TextToFind"
+    if RegExMatch(hocrContent, "bbox\W(\d+)\W(\d+)\W(\d+)\W(\d+)", bbox) ; Adjust regex as necessary
+    {
+        x1 := bbox1
+        y1 := bbox2
+        x2 := bbox3
+        y2 := bbox4
+        centerX := x + x1 + ((x2 - x1) / 2)
+        centerY := y + y1 + ((y2 - y1) / 2)
+        MouseMove, %centerX%, %centerY%
+        Click
+    }
+
+    
 }
 
 LoadDates(filename) {
