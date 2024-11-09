@@ -3,3 +3,4 @@ config*.ini
 dates*.txt
 !dates.example.txt
 libs
+/.vscode
