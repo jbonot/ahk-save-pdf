@@ -26,8 +26,8 @@ class TestSavePdf {
         this.Assert(GoToReport(app, entries[1].fullDate), A_ThisFunc)
     }
     
-    TestGoToCalendar(app) {
-        this.Assert(GoToCalendar(app, entries[1]), A_ThisFunc)
+    TestGoToCalendar() {
+        this.Assert(GoToCalendar(entries[1]), A_ThisFunc)
     }
     
     TestGoToPatient(app) {
@@ -35,8 +35,19 @@ class TestSavePdf {
     }
     
     Test() {
+        if WinExist("Selecteer een datum") {
+            WinClose
+            Sleep 500
+        }
+        
+        if WinExist("OK Overzicht") {
+            WinClose
+            Sleep 500
+        }
+        
         this.TestActivateApp()
-    
+        this.TestGoToCalendar()
+
         ; if (app) {
         ;     TestGoToCalendar(app)
         ;     TestGoToPatient(app)

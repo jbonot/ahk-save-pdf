@@ -7,7 +7,7 @@ DownloadAllEntries(app, isTest := 0) {
     processed := []
     dates := LoadDates('dates.txt')
     for entry in dates {
-        GoToCalendar(app, entry)
+        GoToCalendar(entry)
 
         ; To-do: Narrow scope to calendar instead of app
         calendar := app
@@ -23,7 +23,7 @@ DownloadAllEntries(app, isTest := 0) {
             processed.Push(timeslot.Name)
 
             ; To-do: Go back to calendar view
-            GoToCalendar(app, entry)
+            GoToCalendar(entry)
         }
     }
 }
@@ -34,16 +34,28 @@ GoToPatient(app) {
     app.WaitElement({ Name: "Volledig dossier", mm: 2 }).Click()
 }
 
-GoToCalendar(app, entry) {
-    app.FindElement({ Type: "MenuItem", Name: "Afspraken" }).Click()
-    app.WaitElement({ Name: "Overzicht OK andere dag", mm: 2 }).Click()
+GoToCalendar(entry) {
+    Click(283, 33) ; "Afspraken"
+    Sleep(500)
+    Click(360, 140) ; "Overzich OK andere dag"
+    Sleep(500)
 
-    ; Select Date
-    dateSelect := WinWait("Selecteer een datum")
-    dateSelect.FindElement({ Type: "Spinner", Name: "day" }).Value := entry.day
-    dateSelect.FindElement({ Type: "Spinner", Name: "month" }).Value := entry.month
-    dateSelect.FindElement({ Type: "Spinner", Name: "year" }).Value := entry.year
-    dateSelect.FindElement({ Type: "Button", Name: "Selecteer" }).Click()
+    if WinExist("Selecteer een datum") {
+        WinActivate
+        Sleep(100)
+    } else {
+        return 0
+    }
+
+    ; As soon as a valid input (e.g., day) is entered, the program immediately tabs to the next field
+    SendText(entry.day)
+    Sleep(500)
+    SendText(entry.month)
+    Sleep(500)
+    SendText(entry.year)
+    Sleep(500)
+    Send("{Tab}")
+    Send("{Space}")
     return 1
 }
 
