@@ -2,10 +2,10 @@
 #include Utils.ahk
 #include libs\UIA.ahk
 
-dates := LoadDates('dates.txt')
 
 DownloadAllEntries(app, isTest := 0) {
     processed := []
+    dates := LoadDates('dates.txt')
     for entry in dates {
         GoToCalendar(app, entry)
 
