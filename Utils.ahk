@@ -57,7 +57,7 @@ LoadConfig(filename) {
     return config
 }
 
-LocateText(directory, targetText) {
+LocateText(targetText) {
     filePath := ".\tmp.png"
     x := 0
     y := 74
@@ -71,7 +71,7 @@ LocateText(directory, targetText) {
 
     tesseractPath := "C:\Program Files\Tesseract-OCR\tesseract.exe"
     outputPath := ".\outut"
-    RunWait(tesseractPath . " " "" filePath "" " " "" outputPath "" " -c tessedit_create_hocr=1 --oem 3 -l eng")
+    RunWait(tesseractPath . " " "" filePath "" " " "" outputPath "" " -c tessedit_create_hocr=1 --oem 3 -l nld+fra")
 
     hocrContent := FileRead(outputPath . ".hocr")
 
