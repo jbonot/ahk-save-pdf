@@ -2,13 +2,6 @@
 #include Utils.ahk
 #include libs\Gdip_All.ahk
 
-application := {
-    x: 0,
-    y: 74,
-    width: 2560,
-    height: 1326
-}
-
 DownloadAllEntries() {
     processed := []
     dates := LoadDates('dates.txt')

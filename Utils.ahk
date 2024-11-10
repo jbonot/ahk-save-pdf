@@ -1,6 +1,12 @@
 #Requires AutoHotkey v2
 
 tesseractPath := "C:\Program Files\Tesseract-OCR\tesseract.exe"
+applicationBoundingBox := {
+    x: 0,
+    y: 74,
+    width: 2560,
+    height: 1326
+}
 
 ActvateWindow(windowTitleStart) {
     if WinExist(windowTitleStart) {
@@ -121,7 +127,7 @@ ReadTextAtPosition(bbox) {
     return FileRead(outputPath . ".txt")
 }
 
-LocateTextAtPosition(targetText, bbox := application) {
+LocateTextAtPosition(targetText, bbox := applicationBoundingBox) {
     matches := []  ; Array to store all found coordinates
     position := 1  ; Starting position for RegExMatch
 
