@@ -29,6 +29,13 @@ DownloadAllEntries(app, isTest := 0) {
     }
 }
 
+ActivateOrExit(title) {
+    if !ActvateWindow(title) {
+        MsgBox("Could not find window: " . title)
+        ExitApp()
+    }
+}
+
 GoToPatient(app) {
     app.WaitElement({ Name: "Selecteer patiënt", mm: 2 }).Click()
     app.FindElement({ Type: "MenuItem", Name: "Dossier" }).Click()
@@ -41,12 +48,7 @@ GoToCalendar(entry) {
     Click(360, 140) ; "Overzicht OK andere dag"
     Sleep(500)
 
-    if WinExist("Selecteer een datum") {
-        WinActivate
-        Sleep(100)
-    } else {
-        return 0
-    }
+    ActivateOrExit("Selecteer een datum")
 
     ; As soon as a valid input (e.g., day) is entered, the program immediately tabs to the next field
     SendText(entry.day)
@@ -88,12 +90,11 @@ DownloadFile(app, isTest := 0) {
     app.FindElement({ Type: "MenuItem", Name: "Afdrukken" }).Click()
     app.WaitElement({ Name: "Nota view", mm: 2 }).Click()
 
-    WinWait("Print")
-    printEl := GetWindow("Print")
-    printEl.FindElement({ Type: "Button", Name: "Print" }).Click()
+    Sleep(1000)
+    ActivateOrExit("Print")
+    ; printEl.FindElement({ Type: "Button", Name: "Print" }).Click()
 
-    WinWait("Printeruitvoer opslaan als")
-    printEl := GetWindow("Printeruitvoer opslaan als")
+    ; ActivateOrExit("Printeruitvoer opslaan als")
     if fileName {
         printEl.FindElement({ Type: "Edit", Name: "Bestandsnaam" }).Valuee := fileName
         saveBtn := printEl.FindElement({ Type: "Button", Name: "Opslaan" })

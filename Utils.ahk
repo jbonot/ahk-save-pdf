@@ -1,19 +1,12 @@
 #Requires AutoHotkey v2
-#include libs\UIA.ahk
 
-GetWindow(searchHandleSubstring) {
-    windowList := WinGetList()
-
-    foundHandle := 0
-    for hwnd in windowList {
-        windowTitle := WinGetTitle(hwnd)
-        if InStr(windowTitle, searchHandleSubstring) {
-            foundHandle := hwnd
-            break
-        }
+ActvateWindow(windowTitleStart) {
+    if WinExist(windowTitleStart) {
+        WinActivate
+        return 1
     }
 
-    return foundHandle ? UIA.ElementFromHandle(foundHandle) : 0
+    return 0
 }
 
 CapitalizeName(name) {
