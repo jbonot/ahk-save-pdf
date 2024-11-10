@@ -1,22 +1,19 @@
 #Requires AutoHotkey v2
 #include Utils.ahk
-#include libs\UIA.ahk
 #include libs\Gdip_All.ahk
 
 
-DownloadAllEntries(app, isTest := 0) {
+DownloadAllEntries() {
     processed := []
     dates := LoadDates('dates.txt')
     for entry in dates {
         GoToCalendar(entry)
 
-        ; To-do: Narrow scope to calendar instead of app
-        calendar := app
         for coord in LocateText(entry.name) {
             Click(coord.x, coord.y, "right")
             GoToPatient(coord.x, coord.y)
-            GoToReport(app, entry.fullDate)
-            DownloadFile(app, isTest)
+            GoToReport(entry.fullDate)
+            DownloadFile()
 
             ; To-do: Go back to calendar view
             GoToCalendar(entry)
@@ -58,33 +55,25 @@ GoToCalendar(entry) {
     return 1
 }
 
-GoToReport(app, date) {
-    interventions := app.WaitElement({ Name: "Ingrepen", mm: 2 })
-    interventions.Click()
+GoToReport(date) {
+    ; Click "Ingrepen"
 
-    ; dd/mm/yyyy Orthopedie
-    orthopedics := interventions.FindElement({ Type: "TreeItem", Name: date . " Orthopedie" })
-    orthopedics.Click()
 
-    ; dd/mm/yyyy <description>
-    orthopedics.WaitElement({ Type: "TreeItem", Name: date, mm: 2 }).Click()
-    return 1
+    ; Click dd/mm/yyyy Orthopedie
+    ; Click dd/mm/yyyy <description>
+    return 0
 }
 
-DownloadFile(app, isTest := 0) {
+DownloadFile() {
     fileName := 0
-    toolbar := app.FindFirst("ControlType", "ToolBar")
-    staticTextItems := toolbar.FindAll("ControlType", "Text")
-    for item in staticTextItems {
-        patient := GetPatientData(item.Current.Name)
-        if (patient) {
-            fileName := patient.name . " " . patient.dob
-            break
-        }
+    ; TODO: Fetch name via OCR
+    patient := GetPatientData("(<age>) (DD/MM/YYY) Last Name, First Name (<lang>)")
+    if (patient) {
+        fileName := patient.name . " " . patient.dob
     }
 
-    app.FindElement({ Type: "MenuItem", Name: "Afdrukken" }).Click()
-    app.WaitElement({ Name: "Nota view", mm: 2 }).Click()
+    ; Click "Afdrukken"
+    ; Click "Nota view"
 
     Sleep(1000)
     ActivateOrExit("Print")
@@ -92,14 +81,9 @@ DownloadFile(app, isTest := 0) {
 
     ; ActivateOrExit("Printeruitvoer opslaan als")
     if fileName {
-        printEl.FindElement({ Type: "Edit", Name: "Bestandsnaam" }).Valuee := fileName
-        saveBtn := printEl.FindElement({ Type: "Button", Name: "Opslaan" })
-        if (isTest) {
-            saveBtn.Highlight()
-            printEl.FindElement({ Type: "Button", Name: "Close" }).Click()
-        } else {
-            saveBtn.Click()
-        }
+        SendText(fileName) ; "Bestandsnaam"
+        Send("{Tab}")
+        Send("{Enter}") ; "Opslaan"
     } else {
         MsgBox "Patient info not found"
         return 0

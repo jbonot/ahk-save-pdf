@@ -17,20 +17,20 @@ class TestSavePdf {
         this.Assert(ActivateApp('..\config.ini'), A_ThisFunc)
     }
 
-    TestDownloadFile(app) {
-        this.Assert(DownloadFile(app, 1), A_ThisFunc)
+    TestDownloadFile() {
+        this.Assert(DownloadFile(), A_ThisFunc)
     }
 
-    TestGoToReport(app) {
-        this.Assert(GoToReport(app, entries[1].fullDate), A_ThisFunc)
+    TestGoToReport() {
+        this.Assert(GoToReport(entries[1].fullDate), A_ThisFunc)
     }
 
     TestGoToCalendar() {
         this.Assert(GoToCalendar(entries[1]), A_ThisFunc)
     }
 
-    TestGoToPatient(app) {
-        this.Assert(GoToPatient(app), A_ThisFunc)
+    TestGoToPatient() {
+        this.Assert(GoToPatient(0, 0), A_ThisFunc)
     }
 
     TestLocateText() {
@@ -53,14 +53,10 @@ class TestSavePdf {
         this.TestActivateApp()
         this.TestGoToCalendar()
 
-        ; if (app) {
-        ;     TestGoToCalendar(app)
-        ;     TestGoToPatient(app)
-        ;     TestGoToReport(app)
-        ;     TestDownloadFile(app)
-        ; } else {
-        ;     OutputDebug("Testing interrupted'`r`n")
-        ; }
+        ;     TestGoToPatient()
+        ;     TestGoToReport()
+        ;     TestDownloadFile()
+
     }
 
 }

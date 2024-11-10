@@ -81,13 +81,12 @@ LoadDates(filename) {
 }
 
 GetPatientData(text) {
-    ; Format: (<age>) (DD/MM/YYY) Last Name, First Name (<country>)
+    ; Format: (<age>) (DD/MM/YYY) Last Name, First Name (<lang>)
     if (RegExMatch(text, "(\d{1,2}j) \((\d{1,2})/(\d{1,2})/(\d{4})\) ([\w\s,]+) \((\w+)\)", &match)) {
         return {
             age: match[1],
             dob: match[2] . "." . match[3] . "." . match[4],
             name: CapitalizeName(Trim(match[5])),
-            country: match[6]
         }
     }
     return 0
