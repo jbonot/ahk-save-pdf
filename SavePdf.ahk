@@ -12,16 +12,11 @@ DownloadAllEntries(app, isTest := 0) {
 
         ; To-do: Narrow scope to calendar instead of app
         calendar := app
-        for timeslot in calendar.FindAll({ Name: StrUpper(entry.name), mm: 2 }) {
-            if processed.Has(timeslot.Name) {
-                continue
-            }
-
-            timeslot.Click()
-            GoToPatient(app)
+        for coord in LocateText(entry.name) {
+            Click(coord.x, coord.y, "right")
+            GoToPatient(coord.x, coord.y)
             GoToReport(app, entry.fullDate)
             DownloadFile(app, isTest)
-            processed.Push(timeslot.Name)
 
             ; To-do: Go back to calendar view
             GoToCalendar(entry)
@@ -36,10 +31,11 @@ ActivateOrExit(title) {
     }
 }
 
-GoToPatient(app) {
-    app.WaitElement({ Name: "Selecteer patiënt", mm: 2 }).Click()
-    app.FindElement({ Type: "MenuItem", Name: "Dossier" }).Click()
-    app.WaitElement({ Name: "Volledig dossier", mm: 2 }).Click()
+GoToPatient(startX, startY) {
+    Click(startX + 20, startY + 5) ; "Selecteer patiënt ; To-do check distance
+    ; Click(0, 0) ; "Dossier"
+    ; To-do?: Save name via OCR before proceeding
+    ; Click(0, 0) ; "Volledig dossier"
 }
 
 GoToCalendar(entry) {
