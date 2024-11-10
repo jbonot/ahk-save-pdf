@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2
 #include libs\UIA.ahk
-#include libs\Gdip.ahk
+#include libs\Gdip_All.ahk
 
 GetWindow(searchHandleSubstring) {
     windowList := WinGetList()
@@ -57,32 +57,39 @@ LoadConfig(filename) {
     return config
 }
 
-MakeScreenshot(directory) {
-    ;Screen:	x: 0	y: 74	w: 2560	h: 1326
-    filePath := "C:\path\to\screenshot.png"
+LocateText(directory, targetText) {
+    filePath := ".\tmp.png"
+    x := 0
+    y := 74
+    width := 2560
+    height := 1326
+
+    ; Save screenshot to a file
     pBitmap := Gdip_BitmapFromScreen(x "|" y "|" width "|" height)
     Gdip_SaveBitmapToFile(pBitmap, filePath)
     Gdip_DisposeImage(pBitmap)
-    tesseractPath := "C:\Program Files\Tesseract-OCR\tesseract.exe"
-    outputPath := "C:\path\to\output"
-    RunWait, %tesseractPath% "%filePath%" "%outputPath%" -c tessedit_create_hocr=1 --oem 3 -l eng
-    FileRead, hocrContent, %outputPath%.hocr
 
-    ; Extract coordinates (simple example, customize as needed)
-    targetText := "TextToFind"
-    if RegExMatch(hocrContent, "bbox\W(\d+)\W(\d+)\W(\d+)\W(\d+)", bbox) ; Adjust regex as necessary
+    tesseractPath := "C:\Program Files\Tesseract-OCR\tesseract.exe"
+    outputPath := ".\outut"
+    RunWait(tesseractPath . " " "" filePath "" " " "" outputPath "" " -c tessedit_create_hocr=1 --oem 3 -l eng")
+
+    hocrContent := FileRead(outputPath . ".hocr")
+
+    matches := []  ; Array to store all found coordinates
+    position := 1  ; Starting position for RegExMatch
+
+    while position := RegExMatch(hocrContent, "bbox\\W(\d+)\\W(\d+)\\W(\d+)\\W(\d+)", &bbox, position + StrLen(bbox)) ; Adjust regex as necessary
     {
-        x1 := bbox1
-        y1 := bbox2
-        x2 := bbox3
-        y2 := bbox4
+        x1 := bbox[1]
+        y1 := bbox[2]
+        x2 := bbox[3]
+        y2 := bbox[4]
         centerX := x + x1 + ((x2 - x1) / 2)
         centerY := y + y1 + ((y2 - y1) / 2)
-        MouseMove, %centerX%, %centerY%
-        Click
+        matches.Push({ x: centerX, y: centerY })
     }
 
-    
+    return matches
 }
 
 LoadDates(filename) {
