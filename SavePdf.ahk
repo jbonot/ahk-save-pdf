@@ -9,6 +9,8 @@ application := {
     height: 1326
 }
 
+tesseractPath := "C:\Program Files\Tesseract-OCR\tesseract.exe"
+
 DownloadAllEntries() {
     processed := []
     dates := LoadDates('dates.txt')
@@ -98,27 +100,38 @@ DownloadFile() {
     return 1
 }
 
-GetHocrContent(screen) {
+GetHocrContent(bbox) {
     filePath := ".\tmp.png"
 
-    ; Save screenshot to a file
-    pBitmap := Gdip_BitmapFromScreen(sceen.x "|" sceen.y "|" screen.width "|" screen.height)
+    pBitmap := Gdip_BitmapFrombbox(bbox.x "|" bbox.y "|" bbox.width "|" bbox.height)
     Gdip_SaveBitmapToFile(pBitmap, filePath)
     Gdip_DisposeImage(pBitmap)
 
-    tesseractPath := "C:\Program Files\Tesseract-OCR\tesseract.exe"
-    outputPath := ".\outut"
+
+    outputPath := ".\output"
     RunWait(tesseractPath . " " "" filePath "" " " "" outputPath "" " -c tessedit_create_hocr=1 --oem 3 -l nld+fra")
 
     return FileRead(outputPath . ".hocr")
 }
 
+ReadTextAtPosition(bbox) {
+    filePath := ".\tmp.png"
 
-LocateText(targetText, screen := application) {
+    pBitmap := Gdip_BitmapFrombbox(bbox.x "|" bbox.y "|" bbox.width "|" bbox.height)
+    Gdip_SaveBitmapToFile(pBitmap, filePath)
+    Gdip_DisposeImage(pBitmap)
+
+    outputPath := ".\output"
+    RunWait(tesseractPath . " " "" filePath "" " " "" outputPath "" " --oem 3 -l nld+fra")
+
+    return FileRead(outputPath . ".txt")
+}
+
+LocateTextAtPosition(targetText, bbox := application) {
     matches := []  ; Array to store all found coordinates
     position := 1  ; Starting position for RegExMatch
 
-    hocrContent := GetHocrContent(screen)
+    hocrContent := GetHocrContent(bbox)
 
     while position := RegExMatch(hocrContent, "bbox\\W(\d+)\\W(\d+)\\W(\d+)\\W(\d+).*?" . targetText, &bbox, position + StrLen(bbox))
     {
@@ -126,13 +139,14 @@ LocateText(targetText, screen := application) {
         y1 := bbox[2]
         x2 := bbox[3]
         y2 := bbox[4]
-        centerX := screen.x + x1 + ((x2 - x1) / 2)
-        centerY := screen.y + y1 + ((y2 - y1) / 2)
+        centerX := bbox.x + x1 + ((x2 - x1) / 2)
+        centerY := bbox.y + y1 + ((y2 - y1) / 2)
         matches.Push({ x: centerX, y: centerY })
     }
 
     return matches
 }
+
 
 ActivateApp(filename) {
     config := LoadConfig(filename)
