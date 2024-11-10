@@ -120,7 +120,7 @@ LocateText(targetText, screen := application) {
 
     hocrContent := GetHocrContent(screen)
 
-    while position := RegExMatch(hocrContent, "bbox\\W(\d+)\\W(\d+)\\W(\d+)\\W(\d+)", &bbox, position + StrLen(bbox)) ; Adjust regex as necessary
+    while position := RegExMatch(hocrContent, "bbox\\W(\d+)\\W(\d+)\\W(\d+)\\W(\d+).*?" . targetText, &bbox, position + StrLen(bbox))
     {
         x1 := bbox[1]
         y1 := bbox[2]
