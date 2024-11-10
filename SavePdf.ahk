@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2
 #include Utils.ahk
 #include libs\UIA.ahk
+#include libs\Gdip_All.ahk
 
 
 DownloadAllEntries(app, isTest := 0) {
@@ -108,6 +109,42 @@ DownloadFile(app, isTest := 0) {
     }
 
     return 1
+}
+
+
+LocateText(targetText) {
+    filePath := ".\tmp.png"
+    x := 0
+    y := 74
+    width := 2560
+    height := 1326
+
+    ; Save screenshot to a file
+    pBitmap := Gdip_BitmapFromScreen(x "|" y "|" width "|" height)
+    Gdip_SaveBitmapToFile(pBitmap, filePath)
+    Gdip_DisposeImage(pBitmap)
+
+    tesseractPath := "C:\Program Files\Tesseract-OCR\tesseract.exe"
+    outputPath := ".\outut"
+    RunWait(tesseractPath . " " "" filePath "" " " "" outputPath "" " -c tessedit_create_hocr=1 --oem 3 -l nld+fra")
+
+    hocrContent := FileRead(outputPath . ".hocr")
+
+    matches := []  ; Array to store all found coordinates
+    position := 1  ; Starting position for RegExMatch
+
+    while position := RegExMatch(hocrContent, "bbox\\W(\d+)\\W(\d+)\\W(\d+)\\W(\d+)", &bbox, position + StrLen(bbox)) ; Adjust regex as necessary
+    {
+        x1 := bbox[1]
+        y1 := bbox[2]
+        x2 := bbox[3]
+        y2 := bbox[4]
+        centerX := x + x1 + ((x2 - x1) / 2)
+        centerY := y + y1 + ((y2 - y1) / 2)
+        matches.Push({ x: centerX, y: centerY })
+    }
+
+    return matches
 }
 
 ActivateApp(filename) {
