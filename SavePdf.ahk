@@ -9,8 +9,6 @@ application := {
     height: 1326
 }
 
-tesseractPath := "C:\Program Files\Tesseract-OCR\tesseract.exe"
-
 DownloadAllEntries() {
     processed := []
     dates := LoadDates('dates.txt')
@@ -98,53 +96,6 @@ DownloadFile() {
     }
 
     return 1
-}
-
-GetHocrContent(bbox) {
-    filePath := ".\tmp.png"
-
-    pBitmap := Gdip_BitmapFrombbox(bbox.x "|" bbox.y "|" bbox.width "|" bbox.height)
-    Gdip_SaveBitmapToFile(pBitmap, filePath)
-    Gdip_DisposeImage(pBitmap)
-
-
-    outputPath := ".\output"
-    RunWait(tesseractPath . " " "" filePath "" " " "" outputPath "" " -c tessedit_create_hocr=1 --oem 3 -l nld+fra")
-
-    return FileRead(outputPath . ".hocr")
-}
-
-ReadTextAtPosition(bbox) {
-    filePath := ".\tmp.png"
-
-    pBitmap := Gdip_BitmapFrombbox(bbox.x "|" bbox.y "|" bbox.width "|" bbox.height)
-    Gdip_SaveBitmapToFile(pBitmap, filePath)
-    Gdip_DisposeImage(pBitmap)
-
-    outputPath := ".\output"
-    RunWait(tesseractPath . " " "" filePath "" " " "" outputPath "" " --oem 3 -l nld+fra")
-
-    return FileRead(outputPath . ".txt")
-}
-
-LocateTextAtPosition(targetText, bbox := application) {
-    matches := []  ; Array to store all found coordinates
-    position := 1  ; Starting position for RegExMatch
-
-    hocrContent := GetHocrContent(bbox)
-
-    while position := RegExMatch(hocrContent, "bbox\\W(\d+)\\W(\d+)\\W(\d+)\\W(\d+).*?" . targetText, &bbox, position + StrLen(bbox))
-    {
-        x1 := bbox[1]
-        y1 := bbox[2]
-        x2 := bbox[3]
-        y2 := bbox[4]
-        centerX := bbox.x + x1 + ((x2 - x1) / 2)
-        centerY := bbox.y + y1 + ((y2 - y1) / 2)
-        matches.Push({ x: centerX, y: centerY })
-    }
-
-    return matches
 }
 
 
